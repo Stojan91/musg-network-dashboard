@@ -88,7 +88,7 @@ It scans your LAN, shows all active devices as modern cards, and helps you react
 
 ```bash
 # clone repository
-git clone https://github.com/<your‑user>/musg-network-dashboard.git
+git clone https://github.com/Stojan91/musg-network-dashboard.git
 cd musg-network-dashboard
 
 # (optional) create virtual environment
