@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg-color: #050818;
+            --card-bg: #0b1024;
+            --accent1: #00e5ff;
+            --accent2: #a000ff;
+            --text-main: #e5f0ff;
+            --text-muted: #8b9ccf;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #0b1635 0%, #050818 55%, #000000 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 24px;
+        }
+
+        /* Ekran ładowania + hasło startowe */
+        .splash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top, #0b1635 0%, #050818 60%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .splash-logo {
+            width: 260px;
+            height: 260px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(0,229,255,0.18), rgba(160,0,255,0.02));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                    0 0 28px rgba(0,229,255,0.6),
+                    0 0 56px rgba(160,0,255,0.5);
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        .splash-logo img {
+            max-width: 210px;
+            filter: drop-shadow(0 0 22px rgba(0,229,255,0.9));
+            cursor: pointer;
+        }
+
+        .splash-title {
+            margin-top: 24px;
+            font-size: 30px;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .splash-subtitle {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .splash-bar {
+            margin-top: 24px;
+            width: 200px;
+            height: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(0,229,255,0.1), rgba(160,0,255,0.1));
+            overflow: hidden;
+        }
+
+        .splash-bar-inner {
+            width: 40%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            animation: loading 1.4s linear infinite;
+        }
+
+        .splash-password {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .splash-password label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .splash-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .splash-input {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,229,255,0.45);
+            background: rgba(3,8,25,0.85);
+            color: var(--text-main);
+            min-width: 200px;
+            outline: none;
+        }
+
+        .splash-input::placeholder {
+            color: rgba(139,156,207,0.7);
+        }
+
+        .splash-button {
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: #ffffff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            box-shadow:
+                    0 0 18px rgba(0,229,255,0.6),
+                    0 0 28px rgba(160,0,255,0.5);
+        }
+
+        .splash-error {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #ff8080;
+            min-height: 16px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.04); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes loading {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+
+        /* Nagłówek + menu */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .app-header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .header-logo {
+            width: 184px;
+            height: 92px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-logo img {
+            max-width: 184px;
+            cursor: pointer;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main-subtitle {
+            font-size: 15px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .top-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-tab {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,229,255,0.35);
+            background: rgba(5,12,35,0.9);
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .menu-tab.active {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: #ffffff;
+            box-shadow:
+                    0 0 14px rgba(0,229,255,0.7),
+                    0 0 22px rgba(160,0,255,0.6);
+        }
+
+        #close-net-btn.active {
+    background: linear-gradient(135deg, #ff4b8c, #ffb347);
+    border-color: rgba(255,130,160,0.9);
+    box-shadow:
+            0 0 14px rgba(255,75,140,0.8),
+            0 0 22px rgba(255,179,71,0.7);
+    color: #ffffff;
+}
+
+        .gear-icon {
+            font-size: 15px;
+        }
+
+.lock-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,229,255,0.4);
+  background: rgba(5,12,35,0.85);
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lock-toggle.active {
+  background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(160,0,255,0.25));
+  color: var(--text-main);
+}
+
+
+        .lock-icon {
+            font-size: 14px;
+            filter: drop-shadow(0 0 6px rgba(0,229,255,0.8));
+        }
+
+        .lock-toggle.active {
+            background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(160,0,255,0.25));
+            color: var(--text-main);
+        }
+
+        .lock-toggle.active .lock-icon {
+            filter: drop-shadow(0 0 10px rgba(0,255,120,0.9));
+        }
+
+        .refresh-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        @media (max-width: 800px) {
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .app-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+        }
+        .device-vendor {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .device-card {
+            position: relative;
+            background: radial-gradient(circle at top left, rgba(0,229,255,0.18), rgba(10,14,40,1));
+            border-radius: 14px;
+            padding: 16px 14px 12px 14px;
+            box-shadow:
+                    0 0 24px rgba(0,229,255,0.2),
+                    0 0 40px rgba(160,0,255,0.15);
+            border: 1px solid rgba(0,229,255,0.18);
+            overflow: visible;
+        }
+
+        .device-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                    rgba(0,229,255,0.18),
+                    rgba(160,0,255,0.18));
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.25s ease-out;
+        }
+
+        .device-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Nowe urządzenia (<= 5 minut) */
+        .device-card.new-device {
+            border-color: rgba(255,75,140,0.9);
+            box-shadow:
+                    0 0 24px rgba(255,75,140,0.8),
+                    0 0 40px rgba(255,179,71,0.6);
+        }
+
+.device-card.intruder {
+  border-color: rgba(255,75,0,0.95);
+  box-shadow: 0 0 30px rgba(255,75,0,0.9), 0 0 48px rgba(255,179,71,0.9);
+}
+
+
+        .device-card.new-device .latency-dot {
+            background: radial-gradient(circle, #ff4b4b, #a80000);
+            box-shadow: 0 0 10px rgba(255,75,75,0.9);
+        }
+
+        .device-name {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .device-ip {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(0,229,255,0.08);
+            border: 1px solid rgba(0,229,255,0.35);
+            color: var(--accent1);
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+        }
+
+        .latency-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #0f0, #090);
+            box-shadow: 0 0 10px rgba(0,255,0,0.7);
+            margin-right: 6px;
+        }
+
+        .latency-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .menu {
+            position: relative;
+        }
+
+        .menu-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--accent1);
+        }
+
+        .menu-btn span {
+            font-size: 18px;
+            line-height: 0;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 28px;
+            right: 0;
+            min-width: 140px;
+            border-radius: 10px;
+            background: #060a18;
+            border: 1px solid rgba(0,229,255,0.25);
+            box-shadow:
+                    0 0 18px rgba(0,229,255,0.25),
+                    0 0 30px rgba(160,0,255,0.35);
+            padding: 4px 0;
+            display: none;
+            z-index: 20;
+        }
+
+        .menu-dropdown.show {
+            display: block;
+        }
+
+        .menu-item {
+            font-size: 13px;
+            padding: 8px 12px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg,
+                    rgba(0,229,255,0.2),
+                    rgba(160,0,255,0.2));
+        }
+
+        .menu-item.danger {
+            color: #ff8080;
+        }
+
+        .menu-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ff4b8c, #ffb347);
+            box-shadow: 0 0 9px rgba(255,75,140,0.8);
+        }
+
+        /* Panel ustawień + logi */
+
+        .settings-card {
+            background: radial-gradient(circle at top left, rgba(0,229,255,0.12), rgba(10,14,40,1));
+            border-radius: 16px;
+            padding: 18px 20px 20px 20px;
+            border: 1px solid rgba(0,229,255,0.25);
+            box-shadow:
+                    0 0 24px rgba(0,229,255,0.3),
+                    0 0 40px rgba(160,0,255,0.2);
+            max-width: 520px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .settings-block {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0,229,255,0.18);
+        }
+
+        .settings-block h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .settings-input {
+            display: block;
+            width: 100%;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,229,255,0.35);
+            background: rgba(5,10,30,0.9);
+            color: var(--text-main);
+            outline: none;
+            font-size: 13px;
+        }
+
+        .settings-button {
+            padding: 7px 16px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: #ffffff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .settings-message {
+            margin-top: 4px;
+            font-size: 12px;
+            min-height: 16px;
+        }
+
+        .settings-message.ok {
+            color: #7dffb0;
+        }
+
+        .settings-message.err {
+            color: #ff8080;
+        }
+
+        .logs-box {
+            margin-top: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+            background: rgba(3,8,25,0.85);
+            border-radius: 10px;
+            border: 1px solid rgba(0,229,255,0.3);
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px;
+            padding: 8px 10px;
+        }
+
+        .log-line {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-muted);
+        }
+
+        .log-line.new-event {
+            color: #ffb38c;
+        }
+    </style>
+</head>
+<body>
+    <div id="details-modal" style="display:none;
+  position:fixed; inset:0; background:rgba(0,0,0,0.6);
+  align-items:center; justify-content:center; z-index:1900;">
+  <div style="background:#060a18; border-radius:14px; padding:18px 22px;
+      border:1px solid rgba(0,229,255,0.6); max-width:380px; width:90%;
+      box-shadow:0 0 24px rgba(0,229,255,0.9);">
+    <h3 id="details-title" style="margin-top:0; margin-bottom:10px; font-size:16px; color:#00e5ff;">
+      Device details
+    </h3>
+    <div id="details-content" style="font-size:13px; color:#e5f0ff; line-height:1.5;"></div>
+    <div style="margin-top:14px; text-align:right;">
+      <button type="button" onclick="closeDetailsModal()" style="
+        padding:7px 14px; border-radius:999px; border:none; cursor:pointer;
+        background:linear-gradient(135deg,#00e5ff,#a000ff); color:#fff;
+        font-size:12px; text-transform:uppercase; letter-spacing:0.08em;">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL intruza -->
+<div id="intruder-modal" style="display:none;
+  position:fixed; inset:0; background:rgba(0,0,0,0.65);
+  align-items:center; justify-content:center; z-index:2000;">
+  <div style="background:#060a18; border-radius:14px; padding:18px 22px;
+      border:1px solid rgba(0,229,255,0.6); max-width:360px; width:90%;
+      box-shadow:0 0 24px rgba(255,75,140,0.9);">
+    <h3 style="margin-top:0; margin-bottom:10px; font-size:16px; color:#ff4b8c;">
+      Intruder detected / Wykryto podejrzane urządzenie
+    </h3>
+    <div id="intruder-details" style="font-size:13px; color:#e5f0ff; line-height:1.5;"></div>
+    <div style="margin-top:14px; text-align:right;">
+      <button type="button" onclick="closeIntruderModal()" style="
+        padding:7px 14px; border-radius:999px; border:none; cursor:pointer;
+        background:linear-gradient(135deg,#00e5ff,#a000ff); color:#fff;
+        font-size:12px; text-transform:uppercase; letter-spacing:0.08em;">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- małe okno pomocy przy panelu routera -->
+<div id="disconnect-help" style="display:none;
+  position:fixed; right:12px; bottom:12px; width:280px;
+  background:#050818; border-radius:12px;
+  border:1px solid rgba(0,229,255,0.6); padding:10px 12px;
+  box-shadow:0 0 18px rgba(0,229,255,0.6); z-index:1500;">
+  <div id="disconnect-help-content" style="font-size:12px; color:#e5f0ff;"></div>
+  <div style="margin-top:8px; text-align:right;">
+    <button type="button" onclick="closeDisconnectHelp()" style="
+      padding:4px 10px; border-radius:999px; border:none; cursor:pointer;
+      background:linear-gradient(135deg,#00e5ff,#a000ff); color:#fff;
+      font-size:11px; text-transform:uppercase; letter-spacing:0.08em;">
+      Zamknij / Close
+    </button>
+  </div>
+</div>
+
+<div class="splash" id="splash">
+    <div class="splash-logo">
+        <a href="/" title="MUSG – strona główna">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="MUSG logo">
+        </a>
+    </div>
+    <div class="splash-title">MUSG</div>
+    <div class="splash-subtitle">Network Device Monitor</div>
+    <div class="splash-bar">
+        <div class="splash-bar-inner"></div>
+    </div>
+
+    <div class="splash-password">
+        <label for="splash-pass">
+            Podaj hasło, aby wyświetlić listę urządzeń:
+        </label>
+        <div class="splash-input-row">
+            <input
+                    id="splash-pass"
+                    type="password"
+                    class="splash-input"
+                    placeholder="Hasło administratora">
+            <button class="splash-button" onclick="unlockDashboard()">
+                Wejdź
+            </button>
+        </div>
+        <div id="splash-error" class="splash-error"></div>
+    </div>
+</div>
+
+<div class="app-container" id="app" style="opacity:0; transform: translateY(24px); transition: all .45s ease-out;">
+    <header class="app-header">
+        <div class="app-header-left">
+            <div class="header-logo">
+                <a href="/" title="MUSG – strona główna">
+                    <img src="{{ url_for('static', filename='l.png') }}" alt="MUSG logo">
+                </a>
+            </div>
+            <div class="header-text">
+                <div class="app-subtitle main-subtitle">
+                    <span id="header-title">Lokalny podgląd urządzeń w sieci</span>
+                    <button id="lock-toggle"
+        class="lock-toggle"
+        type="button"
+        onclick="toggleMask()">
+  <span class="lock-icon" id="lock-icon"></span>
+  <span id="lock-label"></span>
+</button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="app-header-right">
+            <nav class="top-menu">
+                <button id="close-network-btn"
+        type="button"
+        class="lock-toggle"
+        onclick="toggleCloseNetwork()">
+  <span class="lock-icon" id="close-network-icon">🔓</span>
+  <span id="close-network-label">Close Network OFF</span>
+</button>
+
+                <button id="tab-view" class="menu-tab active" type="button" onclick="switchTab('view')">
+                    Podgląd
+                </button>
+                <button id="tab-settings" class="menu-tab" type="button" onclick="switchTab('settings')">
+                    <span class="gear-icon">⚙️</span>
+                    <span>Ustawienia</span>
+                </button>
+            </nav>
+            <div class="refresh-status" id="refresh-box">
+                <div id="refresh-label">Auto-refresh co kilka sekund</div>
+                <div id="last-refresh">Ładowanie...</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="grid" id="device-grid">
+            <!-- Kafelki urządzeń -->
+        </section>
+
+        <section id="settings-panel" style="display:none; margin-top: 16px;">
+            <div class="settings-card">
+                <h2 class="settings-title">Ustawienia systemu</h2>
+<div class="settings-block">
+    <h3>Połączenia zewnętrzne</h3>
+    <div class="logs-box" id="ext-box"></div>
+    <button class="settings-button" style="margin-top:8px;" type="button" onclick="refreshExternalIps()">
+        Odśwież połączenia
+    </button>
+</div>
+
+                <div class="settings-block">
+                    <h3>Zmiana hasła</h3>
+                    <label>
+                        Aktualne hasło:
+                        <input type="password" id="current-pass" class="settings-input">
+                    </label>
+                    <label>
+                        Nowe hasło:
+                        <input type="password" id="new-pass" class="settings-input">
+                    </label>
+                    <button class="settings-button" type="button" onclick="changePassword()">
+                        Zapisz hasło
+                    </button>
+                    <div id="pass-message" class="settings-message"></div>
+                </div>
+
+                <div class="settings-block">
+                    <h3>Język interfejsu</h3>
+                    <select id="lang-select" class="settings-input" onchange="changeLanguage()">
+                        <option value="pl">Polski</option>
+                        <option value="en">English</option>
+                    </select>
+                    <div id="lang-message" class="settings-message"></div>
+                </div>
+
+                <div class="settings-block">
+                    <h3>Logi urządzeń</h3>
+                    <div class="logs-box" id="logs-box">
+                        <!-- log lines -->
+                    </div>
+                    <button class="settings-button" style="margin-top:8px;" type="button" onclick="refreshLogs()">
+                        Odśwież logi
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+
+
+
+
+
+
+<script>
+let lastSeenMap = {}; // ip -> timestamp (ms)
+const OFFLINE_TIMEOUT_MS = 60 * 60 * 1000; // 1 godzina
+const SCAN_INTERVAL_MS = 8000;
+let customNames = {}; // ip -> custom name
+let intruderIps = new Set();
+
+const detailsModal = document.getElementById("details-modal");
+const detailsContent = document.getElementById("details-content");
+const detailsTitle = document.getElementById("details-title");
+
+const splash = document.getElementById("splash");
+const splashInput = document.getElementById("splash-pass");
+const splashError = document.getElementById("splash-error");
+const appRoot = document.getElementById("app");
+const grid = document.getElementById("device-grid");
+const settingsPanel = document.getElementById("settings-panel");
+const lastRefreshEl = document.getElementById("last-refresh");
+const refreshBoxEl = document.getElementById("refresh-box");
+const refreshLabelEl = document.getElementById("refresh-label");
+const lockToggleEl = document.getElementById("lock-toggle");
+const lockIconEl = document.getElementById("lock-icon");
+const lockLabelEl = document.getElementById("lock-label");
+const tabViewBtn = document.getElementById("tab-view");
+const tabSettingsBtn = document.getElementById("tab-settings");
+const logsBox = document.getElementById("logs-box");
+
+// MODAL dla intruza
+const intruderModal = document.getElementById("intruder-modal");
+const intruderDetails = document.getElementById("intruder-details");
+
+// małe okno z instrukcją odłączania
+const helpWindow = document.getElementById("disconnect-help");
+const helpContent = document.getElementById("disconnect-help-content");
+
+let MASTER_PASSWORD = "zrodlana4";
+let currentLang = "pl";
+let maskingEnabled = true;
+let devicesCache = [];
+let closeNetworkEnabled = false;
+
+const NEWWINDOW_MS = 5 * 60 * 1000; // 5 minut
+const ROUTER_URL = "http://192.168.1.1"; // adres panelu Nighthawk – zmień jeśli inny
+
+// TŁUMACZENIA
+const I18N = {
+  pl: {
+    headerTitle: "Lokalny podgląd urządzeń w sieci",
+    refreshLabel: "Auto-refresh co kilka sekund",
+    lastRefresh: "Ostatnie odświeżenie:",
+    hiddenData: "Ukryte dane",
+    showData: "Pokaż dane",
+    settingsTitle: "Ustawienia systemu",
+    changePass: "Zmiana hasła",
+    langLabel: "Język interfejsu",
+    fillBoth: "Wypełnij oba pola.",
+    badCurrent: "Aktualne hasło jest nieprawidłowe.",
+    passSaved: "Hasło zostało zmienione (działa od nowego logowania).",
+    langChanged: "Język zmieniony.",
+    newDevice: "Nowe urządzenie",
+    logsLabel: "Logi urządzeń",
+    disconnectSent: "Urządzenie oznaczone jako intruz i odłączenie zostało zainicjowane.",
+    disconnectError: "Błędne hasło albo błąd serwera.",
+    disconnectPrompt: "Podaj hasło, aby odłączyć:",
+    emptyPassword: "Hasło nie może być puste.",
+    noDevices: "Brak wykrytych urządzeń w sieci.",
+    logsEmpty: "Brak logów.",
+    helpTitle: "Jak odłączyć urządzenie w panelu routera",
+    helpIntro: "Otworzyliśmy panel administracyjny routera w nowej karcie. Postępuj według kroków poniżej:",
+    helpSteps: [
+      "Zaloguj się do panelu routera na nowej karcie (użyj swojego loginu i hasła administratora).",
+      "Przejdź do sekcji 'Attached Devices', 'Connected Devices' lub podobnej.",
+      "Znajdź urządzenie o podanym IP i MAC, które zaznaczyłeś jako intruza.",
+      "Użyj opcji 'Block', 'Deny', 'Add to Blacklist' lub podobnej, aby zablokować dostęp.",
+      "Zapisz zmiany w panelu routera."
+    ],
+    helpNote: "Po zablokowaniu urządzenia możesz zamknąć to okno pomocy.",
+    helpClose: "Zamknij okno pomocy",
+    online: "Online",
+    btnDisconnect: "Odłącz i oznacz jako intruz",
+    btnSetConn: "Ustaw LAN / Wi‑Fi",
+    btnDetails: "Szczegóły urządzenia",
+    btnRename: "Zmień nazwę",
+    closeNetworkOn: "Close Network ON (whitelist)",
+    closeNetworkOff: "Close Network OFF",
+    tabView: "Podgląd",
+    tabSettings: "Ustawienia",
+    renamePrompt: "Nowa nazwa dla urządzenia:",
+    detailsTitle: "Szczegóły urządzenia"
+  },
+  en: {
+    headerTitle: "Local network device monitor",
+    refreshLabel: "Auto-refresh every few seconds",
+    lastRefresh: "Last refresh:",
+    hiddenData: "Hidden data",
+    showData: "Show data",
+    settingsTitle: "System settings",
+    changePass: "Change password",
+    langLabel: "Interface language",
+    fillBoth: "Fill both fields.",
+    badCurrent: "Current password is incorrect.",
+    passSaved: "Password changed (will apply on next login).",
+    langChanged: "Language changed.",
+    newDevice: "New device",
+    logsLabel: "Device logs",
+    disconnectSent: "Device marked as intruder and disconnect has been triggered.",
+    disconnectError: "Wrong password or server error.",
+    disconnectPrompt: "Enter password to disconnect:",
+    emptyPassword: "Password cannot be empty.",
+    noDevices: "No detected devices on the network.",
+    logsEmpty: "No logs.",
+    helpTitle: "How to disconnect a device in the router panel",
+    helpIntro: "We have opened the router admin panel in a new tab. Follow the steps below:",
+    helpSteps: [
+      "Log in to the router's admin panel in the new tab (use your admin login and password).",
+      "Go to the 'Attached Devices', 'Connected Devices' or similar section.",
+      "Find the device with the shown IP and MAC that you marked as an intruder.",
+      "Use the 'Block', 'Deny', 'Add to Blacklist' or similar option to block access.",
+      "Save changes in the router panel."
+    ],
+    helpNote: "After blocking the device you can close this help window.",
+    helpClose: "Close help window",
+    online: "Online",
+    btnDisconnect: "Disconnect and mark as intruder",
+    btnSetConn: "Set LAN / Wi‑Fi",
+    btnDetails: "Device details",
+    btnRename: "Rename",
+    closeNetworkOn: "Close Network ON (whitelist)",
+    closeNetworkOff: "Close Network OFF",
+    tabView: "View",
+    tabSettings: "Settings",
+    renamePrompt: "New name for device:",
+    detailsTitle: "Device details"
+  }
+};
+
+function openDetails(ip) {
+  const dev = (devicesCache || []).find(d => d.ip === ip);
+  if (!dev) return;
+  const t = I18N[currentLang];
+
+  const realName = dev.name || "Unknown";
+  const mac = dev.mac || "Unknown";
+  const firstSeen = dev.first_seen_at || "Unknown";
+  const vendor = dev.vendor || "Unknown vendor";
+  const typeLabel =
+    dev.conn_type === "lan" || dev.conntype === "lan"
+      ? "LAN"
+      : dev.conn_type === "wifi" || dev.conntype === "wifi"
+      ? "Wi‑Fi"
+      : "LAN/Wi‑Fi (unknown)";
+
+  detailsTitle.textContent = t.detailsTitle;
+  detailsContent.innerHTML = `
+    <strong>Name:</strong> ${realName}<br>
+    <strong>IP:</strong> ${dev.ip}<br>
+    <strong>MAC:</strong> ${mac}<br>
+    <strong>Vendor:</strong> ${vendor}<br>
+    <strong>Connection type:</strong> ${typeLabel}<br>
+    <strong>First seen:</strong> ${firstSeen}
+  `;
+  detailsModal.style.display = "flex";
+}
+
+
+function closeDetailsModal() {
+  detailsModal.style.display = "none";
+}
+
+function renameDevice(ip) {
+  const dev = (devicesCache || []).find(d => d.ip === ip);
+  const t = I18N[currentLang];
+  const currentName = dev ? (dev.name || "Unknown") : "";
+  const value = prompt(t.renamePrompt, currentName);
+  if (value === null) return;
+  const newName = value.trim();
+  if (!newName) return;
+  customNames[ip] = newName;
+  if (dev) dev.name = newName;
+  renderDevices(devicesCache);
+}
+
+
+
+function applyLanguage() {
+  const t = I18N[currentLang];
+  document.getElementById("header-title").textContent = t.headerTitle;
+  refreshLabelEl.textContent = t.refreshLabel;
+
+  const settingsTitleEl = document.querySelector("section#settings-panel h2.settings-title");
+  if (settingsTitleEl) settingsTitleEl.textContent = t.settingsTitle;
+  const blocks = document.querySelectorAll("section#settings-panel .settings-block h3");
+  if (blocks.length >= 3) {
+    blocks[0].textContent = t.changePass;
+    blocks[1].textContent = t.langLabel;
+    blocks[2].textContent = t.logsLabel;
+  }
+
+  // zakładki
+  tabViewBtn.textContent = t.tabView;
+  tabSettingsBtn.innerHTML = `<span class="gear-icon"></span><span>${t.tabSettings}</span>`;
+
+  updateCloseNetworkUI();
+}
+
+
+function hideSplash() {
+  splash.style.opacity = 0;
+  splash.style.pointerEvents = "none";
+  setTimeout(() => {
+    splash.style.display = "none";
+  }, 500);
+  appRoot.style.opacity = 1;
+  appRoot.style.transform = "translateY(0)";
+}
+
+function unlockDashboard() {
+  const value = splashInput.value.trim();
+  if (!value) {
+    splashError.textContent = "Hasło nie może być puste.";
+    return;
+  }
+  if (value !== MASTER_PASSWORD) {
+    splashError.textContent = "Nieprawidłowe hasło.";
+    return;
+  }
+  splashError.textContent = "";
+  hideSplash();
+  switchTab("view");
+  fetchDevices();
+  setInterval(fetchDevices, 8000);
+}
+
+
+splashInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") unlockDashboard();
+});
+
+// Zakładki
+function switchTab(tab) {
+  if (tab === "view") {
+    tabViewBtn.classList.add("active");
+    tabSettingsBtn.classList.remove("active");
+    grid.style.display = "grid";
+    settingsPanel.style.display = "none";
+    refreshBoxEl.style.display = "block";
+  } else {
+    tabViewBtn.classList.remove("active");
+    tabSettingsBtn.classList.add("active");
+    grid.style.display = "none";
+    settingsPanel.style.display = "block";
+    refreshBoxEl.style.display = "none";
+  }
+}
+
+function neonMask(source, length) {
+  const chars = "A8XZ3?!";
+  let out = "";
+  const target = Math.max(length, source.length, 8);
+  for (let i = 0; i < target; i++) {
+    out += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return out;
+}
+
+
+
+function updateCloseNetworkUI() {
+  const btn = document.getElementById("close-network-btn");
+  const icon = document.getElementById("close-network-icon");
+  const label = document.getElementById("close-network-label");
+  if (!btn || !icon || !label) return;
+  const t = I18N[currentLang];
+
+  if (closeNetworkEnabled) {
+    btn.classList.add("active");
+    icon.textContent = "🔒";
+    label.textContent = t.closeNetworkOn;
+  } else {
+    btn.classList.remove("active");
+    icon.textContent = "🔓";
+    label.textContent = t.closeNetworkOff;
+  }
+}
+
+
+async function toggleCloseNetwork() {
+  const t = I18N[currentLang];
+  const password = prompt(
+    currentLang === "pl"
+      ? "Podaj hasło, aby przełączyć Close Network:"
+      : "Enter password to toggle Close Network:"
+  );
+  if (password === null) return;
+  if (!password.trim()) {
+    alert(currentLang === "pl" ? "Hasło nie może być puste." : "Password cannot be empty.");
+    return;
+  }
+
+  const url = closeNetworkEnabled
+    ? "api/close_network/disable"
+    : "api/close_network/enable";
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "ok") {
+      alert(data.message || "Error");
+      return;
+    }
+    closeNetworkEnabled = !closeNetworkEnabled;
+    updateCloseNetworkUI();
+    fetchDevices();
+    refreshLogs();
+  } catch (err) {
+    console.error(err);
+    alert("Network error.");
+  }
+}
+
+
+function updateLockUI() {
+  const t = I18N[currentLang];
+  if (maskingEnabled) {
+    lockToggleEl.classList.remove("active");
+    lockIconEl.textContent = "🔒";
+    lockLabelEl.textContent = t.hiddenData;
+  } else {
+    lockToggleEl.classList.add("active");
+    lockIconEl.textContent = "🔓";
+    lockLabelEl.textContent = t.showData;
+  }
+}
+
+
+function toggleMask() {
+  maskingEnabled = !maskingEnabled;
+  updateLockUI();
+  renderDevices(devicesCache);
+}
+
+
+
+async function fetchDevices() {
+  try {
+    const res = await fetch("api/devices");
+    const data = await res.json();
+    const now = Date.now();
+
+    (data || []).forEach(dev => {
+      if (dev.ip) {
+        lastSeenMap[dev.ip] = now;
+      }
+    });
+
+    devicesCache = data || [];
+    devicesCache.forEach(d => {
+  if (d.ip && customNames[d.ip]) {
+    d.name = customNames[d.ip];
+  }
+});
+
+    renderDevices(devicesCache);
+    const t = I18N[currentLang];
+    lastRefreshEl.textContent = `${t.lastRefresh} ${new Date().toLocaleTimeString()}`;
+  } catch (err) {
+    lastRefreshEl.textContent = "Błąd pobierania danych.";
+    console.error(err);
+  }
+}
+
+function isOffline(dev) {
+  if (!dev.ip) return false;
+  const last = lastSeenMap[dev.ip];
+  if (!last) return false;
+  const now = Date.now();
+  return (now - last) > (SCAN_INTERVAL_MS || 8000) && (now - last) <= OFFLINE_TIMEOUT_MS;
+}
+
+function isNewDevice(dev) {
+  if (!dev.first_seen_at) return false;
+  const first = new Date(dev.first_seen_at);
+  if (isNaN(first.getTime())) return false;
+  const now = new Date();
+  return (now - first) <= NEWWINDOW_MS;
+}
+
+// intruz = po prostu „nowe urządzenie”
+function isIntruder(dev) {
+  if (!dev || !dev.ip) return false;
+  return intruderIps.has(dev.ip);
+}
+
+
+
+
+function renderDevices(devices) {
+  const t = I18N[currentLang];
+  grid.innerHTML = "";
+
+  const allIps = new Set(Object.keys(lastSeenMap));
+  (devices || []).forEach(d => { if (d.ip) allIps.add(d.ip); });
+
+  const merged = [];
+  allIps.forEach(ip => {
+    let dev = (devices || []).find(d => d.ip === ip);
+    if (!dev) {
+      dev = { ip: ip, name: "Unknown", mac: "Unknown", first_seen_at: null, conn_type: "unknown" };
+    }
+    merged.push(dev);
+  });
+
+  if (!merged.length) {
+    grid.innerHTML = `<p>${t.noDevices}</p>`;
+    return;
+  }
+
+  const sorted = merged.sort((a, b) => (a.ip || "").localeCompare(b.ip || ""));
+  sorted.forEach(dev => {
+    const card = document.createElement("article");
+    card.className = "device-card";
+
+    const realName = dev.name || "Unknown";
+    const realIp = dev.ip || "";
+    const newFlag = isNewDevice(dev);
+    const offline = isOffline(dev);
+
+    if (newFlag) card.classList.add("new-device");
+    if (isIntruder(dev)) card.classList.add("intruder");
+
+    const displayName = maskingEnabled ? neonMask(realName, realName.length) : realName;
+    const displayIp = maskingEnabled ? neonMask(realIp, realIp.length) : realIp;
+
+    let connLabel = "LAN/Wi‑Fi";
+    if (dev.conn_type === "lan" || dev.conntype === "lan") connLabel = "LAN";
+    else if (dev.conn_type === "wifi" || dev.conntype === "wifi") connLabel = "Wi‑Fi";
+
+    const badgeText = newFlag ? t.newDevice : connLabel;
+    const statusText = offline ? t.offline : t.online;
+    const vendor = dev.vendor || "";
+   const html = `
+  <div class="card-top">
+    <div>
+      <div class="device-name">${displayName}</div>
+      <div class="device-ip">${displayIp}</div>
+      ${vendor ? `<div class="device-vendor">${vendor}</div>` : ""}
+    </div>
+    <div class="menu">
+      <button class="menu-btn" onclick="toggleMenu(this)"><span>⋮</span></button>
+      <div class="menu-dropdown">
+        <div class="menu-item" onclick="openDetails('${realIp}')">
+          <span class="menu-dot"></span>
+          <span>${t.btnDetails}</span>
+        </div>
+        <div class="menu-item" onclick="openConnTypeDialog('${realIp}')">
+          <span class="menu-dot"></span>
+          <span>${t.btnSetConn}</span>
+        </div>
+        <div class="menu-item" onclick="renameDevice('${realIp}')">
+          <span class="menu-dot"></span>
+          <span>${t.btnRename}</span>
+        </div>
+        <div class="menu-item danger" onclick="disconnectIp('${realIp}')">
+          <span class="menu-dot"></span>
+          <span>${t.btnDisconnect}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="latency-label">
+      <span class="latency-dot" style="${offline ? 'background:radial-gradient(circle,#f00,#900);box-shadow:0 0 10px rgba(255,0,0,0.7);' : ''}"></span>
+      <span>${statusText}</span>
+    </div>
+    <span class="badge">${badgeText}</span>
+  </div>
+`;
+
+    card.innerHTML = html;
+    grid.appendChild(card);
+  });
+}
+
+
+
+
+function toggleMenu(btn) {
+  const dropdown = btn.parentElement.querySelector(".menu-dropdown");
+  const isOpen = dropdown.classList.contains("show");
+  document.querySelectorAll(".menu-dropdown.show").forEach((el) => el.classList.remove("show"));
+  if (!isOpen) dropdown.classList.add("show");
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".menu")) {
+    document.querySelectorAll(".menu-dropdown.show").forEach((el) => el.classList.remove("show"));
+  }
+});
+
+// MODAL intruza
+function openIntruderModal(dev) {
+  const t = I18N[currentLang];
+  const typeLabel =
+    dev.conn_type === "lan" || dev.conntype === "lan"
+      ? "LAN"
+      : dev.conn_type === "wifi" || dev.conntype === "wifi"
+      ? "Wi‑Fi"
+      : "LAN/Wi‑Fi (nieznane)";
+
+  intruderDetails.innerHTML = `
+    <strong>Nazwa / Name:</strong> ${dev.name || "Unknown"}<br>
+    <strong>IP:</strong> ${dev.ip}<br>
+    <strong>MAC:</strong> ${dev.mac || "Unknown"}<br>
+    <strong>Typ połączenia / Connection type:</strong> ${typeLabel}<br>
+    <strong>Status:</strong> oznaczono jako potencjalny intruz / marked as potential intruder.
+  `;
+  intruderModal.style.display = "flex";
+}
+
+function closeIntruderModal() {
+  intruderModal.style.display = "none";
+}
+
+// okno pomocy przy panelu routera
+function openDisconnectHelp() {
+  const t = I18N[currentLang];
+  helpContent.innerHTML = `
+    <h3 style="margin-top:0; margin-bottom:8px;">${t.helpTitle}</h3>
+    <p style="font-size:13px; margin-bottom:6px;">${t.helpIntro}</p>
+    <ol style="font-size:13px; padding-left:18px; margin-top:4px; margin-bottom:6px;">
+      ${t.helpSteps.map((s) => `<li>${s}</li>`).join("")}
+    </ol>
+    <p style="font-size:13px; margin-top:4px;">${t.helpNote}</p>
+  `;
+  helpWindow.style.display = "block";
+}
+
+function closeDisconnectHelp() {
+  helpWindow.style.display = "none";
+}
+
+async function disconnectIp(ip) {
+  const dev = (devicesCache || []).find(d => d.ip === ip);
+  const t = I18N[currentLang];
+  const label = dev ? `${dev.name || "Unknown"} (${ip})` : ip;
+  const password = prompt(`${t.disconnectPrompt} ${label}`);
+  if (password === null) return;
+  if (!password.trim()) {
+    alert(t.emptyPassword);
+    return;
+  }
+
+  try {
+    const res = await fetch("api/disconnect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ip, password })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "ok") {
+      alert(data.message || t.disconnectError);
+      return;
+    }
+
+    // toggle intruz: jeśli już jest – zdejmij, jeśli nie – dodaj
+    if (intruderIps.has(ip)) intruderIps.delete(ip);
+    else intruderIps.add(ip);
+
+    alert(t.disconnectSent);
+    if (dev) openIntruderModal(dev);
+
+    window.open(ROUTER_URL, "_blank");
+    openDisconnectHelp();
+
+    renderDevices(devicesCache);
+    refreshLogs();
+  } catch (err) {
+    console.error(err);
+    alert(t.disconnectError);
+  }
+}
+
+// Ustawianie LAN/Wi‑Fi
+function openConnTypeDialog(ip) {
+  const t = I18N[currentLang];
+  const choice = prompt(
+    currentLang === "pl"
+      ? `Ustaw typ połączenia dla ${ip}:\nlan = kabel, wifi = bezprzewodowo, unknown = nieznane`
+      : `Set connection type for ${ip}:\nlan = cable, wifi = wireless, unknown = unknown`
+  );
+  if (choice === null) return;
+  const c = (choice || "").trim().toLowerCase();
+  if (!["lan", "wifi", "unknown"].includes(c)) {
+    alert("Dozwolone wartości: lan / wifi / unknown");
+    return;
+  }
+  setConnType(ip, c);
+}
+
+async function setConnType(ip, ctype) {
+  try {
+    const password = prompt(
+      currentLang === "pl"
+        ? "Podaj hasło administratora, aby zapisać typ połączenia:"
+        : "Enter admin password to save connection type:"
+    );
+    if (password === null) return;
+    if (!password.trim()) {
+      alert(
+        currentLang === "pl"
+          ? "Hasło nie może być puste."
+          : "Password cannot be empty."
+      );
+      return;
+    }
+    const res = await fetch("api/set_conn_type", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ip: ip, conn_type: ctype, password: password })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "ok") {
+      alert(data.message || "Error");
+      return;
+    }
+    fetchDevices();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Zmiana hasła
+async function changePassword() {
+  const cur = document.getElementById("current-pass").value.trim();
+  const nxt = document.getElementById("new-pass").value.trim();
+  const msg = document.getElementById("pass-message");
+  const t = I18N[currentLang];
+
+  msg.textContent = "";
+  msg.classList.remove("ok", "err");
+
+  if (!cur || !nxt) {
+    msg.textContent = t.fillBoth;
+    msg.classList.add("err");
+    return;
+  }
+
+  try {
+    const res = await fetch("api/change_password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ current: cur, new: nxt })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "ok") {
+      msg.textContent = data.message || t.badCurrent;
+      msg.classList.add("err");
+      return;
+    }
+    MASTER_PASSWORD = nxt;
+    document.getElementById("current-pass").value = "";
+    document.getElementById("new-pass").value = "";
+    msg.textContent = t.passSaved;
+    msg.classList.add("ok");
+  } catch (err) {
+    console.error(err);
+    msg.textContent = "Błąd komunikacji z serwerem.";
+    msg.classList.add("err");
+  }
+}
+
+function changeLanguage() {
+  const sel = document.getElementById("lang-select");
+  currentLang = sel.value;
+  applyLanguage();
+  updateCloseNetworkUI();
+  updateLockUI();
+  const msg = document.getElementById("lang-message");
+  const t = I18N[currentLang];
+  msg.textContent = t.langChanged;
+  msg.classList.remove("err");
+  msg.classList.add("ok");
+  refreshLogs();
+}
+
+async function refreshLogs() {
+  try {
+    const res = await fetch("api/logs?limit=200");
+    const data = await res.json();
+    renderLogs(data || []);
+  } catch (err) {
+    console.error("Błąd pobierania logów", err);
+  }
+}
+
+function renderLogs(entries) {
+  logsBox.innerHTML = "";
+  const t = I18N[currentLang];
+  if (!entries.length) {
+    logsBox.textContent = t.logsEmpty;
+    return;
+  }
+  entries.forEach((entry) => {
+    const line = document.createElement("div");
+    line.className = "log-line";
+    if (entry.event === "first_seen") line.classList.add("new-event");
+    const ts = entry.timestamp;
+    const name = entry.name || "Unknown";
+    const ip = entry.ip || "";
+    const ev = entry.event;
+    line.textContent = `${ts}  ${ip}  ${name}  ${ev}`;
+    logsBox.appendChild(line);
+  });
+}
+
+// inicjalizacja
+applyLanguage();
+updateLockUI();
+updateCloseNetworkUI();
+switchTab("view");
+</script>
+
+
+</body>
+</html>
