@@ -27,11 +27,11 @@ KNOWN_IPS_FILE = "known_ips.json"
 LOG_FILE = "logs.jsonl"
 
 # hasło do systemu (zmieniane przez API)
-DISCONNECT_PASSWORD = "zrodlana4"
+DISCONNECT_PASSWORD = "admin"
 
 # Wi‑Fi do deauth
-WIFI_IFACE = "wlxc04a002b0890"  # interfejs TL‑WN722N w monitor mode
-AP_BSSID = "C0:3C:04:37:13:E0"  # MAC wybranego NETGEAR NIGHTHAWK
+WIFI_IFACE = ""  # interfejs TL‑WN722N w monitor mode
+AP_BSSID = ""  # MAC wybranego NETGEAR NIGHTHAWK
 
 # plik z typami połączeń
 CONN_TYPES_FILE = "conn_types.json"
@@ -385,3 +385,4 @@ if __name__ == "__main__":
     # URUCHAMIAJ JAKO ROOT (bo monitor mode + Scapy):
     # sudo -E python app.py
     app.run(host="0.0.0.0", port=5000, debug=True)
+
