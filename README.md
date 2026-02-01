@@ -13,7 +13,7 @@ It scans your LAN, shows all active devices as modern cards, and helps you react
 ## Features
 
 - **Live device discovery**
-  - Periodic ARP scan of your LAN subnet (e.g. `192.168.1.0/24`).
+  - Periodic ARP scan of your LAN subnet (e.g. `192.168.0.0/24`).
   - Device cards with IP, hostname, MAC address and vendor name (via MAC OUI lookup).
   - New devices are visually highlighted for the first few minutes.
 
